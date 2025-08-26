@@ -1,30 +1,58 @@
 import { Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native'
 import { styles } from './styles'
+import { FilterStatus } from '@/types/FilterStatus'
+import { useState } from 'react'
+import { useProductStore } from '@/store/productsStore'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { Filterstatus } from '@/components/Filter'
-import { FilterStatus, ProductProps } from '@/types/FilterStatus'
 import { Item } from '@/components/Item'
-import { useState } from 'react'
-import { useProductStore } from '@/store/productsStore'
 
 export function Home() {
 
-  const { products, addProduct } = useProductStore()
+  const { products, addProduct, removeProduct, clearProducts, updateStatusProduct } = useProductStore()
   const [status, setStatus] = useState<FilterStatus | null>()
   const [search, setSearch] = useState("")
+
+  const existItem = products.some(item => item.description === search)
+
+
+  function handleUpdateStatusProduct(id: string) {
+    const statusProduct = products.find(item => item.id === id)
+    if (status === FilterStatus.DONE) {
+      Alert.alert(`Produto: ${statusProduct?.description} adicionado a lista de pendentes`)
+      updateStatusProduct(id)
+    } else {
+      Alert.alert(`Produto: ${statusProduct?.description} adicionado a lista de comprados`)
+      updateStatusProduct(id)
+    }
+  }
+
+  function handleClearProduct() {
+    Alert.alert("Limpar!", "Deseja remover todos?", [
+      { text: 'Não', style: 'cancel' },
+      { text: 'Sim', onPress: () => clearProducts() }
+    ])
+  }
+
+  function handleRemoveProduct(id: string) {
+    Alert.alert("Excluir!", "Deseja remover produto?", [
+      { text: 'Não', style: 'cancel' },
+      { text: 'Sim', onPress: () => removeProduct(id) }
+    ])
+  }
 
   function handleAdd() {
     if (!search.trim()) {
       return Alert.alert("Informe a descrição para adicionar um item!")
     }
-    const newItem = {
-      id: Math.random().toString(36).substring(2),
-      description: search,
-      status: FilterStatus.PENDING,
+    if (existItem) {
+      Alert.alert("Negado!", `item: ${search} já consta na lista.`)
+    } else {
+      Alert.alert("Adicionado!", `item adicionado: ${search}`)
+      addProduct(search)
+      setSearch("")
     }
-    console.log(newItem)
-    addProduct(newItem)
   }
 
   const filterProducts = products
@@ -64,7 +92,7 @@ export function Home() {
           />
           <TouchableOpacity
             style={styles.clearButton}
-            onPress={() => setStatus(null)}
+            onPress={() => handleClearProduct()}
           >
             <Text style={styles.clearText}>Limpar</Text>
           </TouchableOpacity>
@@ -72,12 +100,12 @@ export function Home() {
 
         <FlatList
           data={filterProducts}
-          keyExtractor={((item) => String(item.id))}
+          keyExtractor={((item) => item.id)}
           renderItem={({ item }) => (
             <Item
               data={item}
-              onRemove={() => console.log('Remover')}
-              onStatus={() => console.log('Status')}
+              onRemove={() => handleRemoveProduct(item.id)}
+              onStatus={() => handleUpdateStatusProduct(item.id)}
             />
           )}
           showsVerticalScrollIndicator={false}
