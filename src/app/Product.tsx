@@ -1,5 +1,4 @@
 import { Text, View, Image, TouchableOpacity, FlatList, Alert } from 'react-native'
-import { styles } from './styles'
 import { FilterStatus } from '@/types/FilterStatus'
 import { useState } from 'react'
 import { useProductStore } from '@/store/productsStore'
@@ -7,15 +6,20 @@ import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { Filterstatus } from '@/components/Filter'
 import { Item } from '@/components/Item'
+import { ButtonIcon } from '@/components/ButtonIcon'
+import { Title } from '@/components/Title'
+import { stylesProduct } from '@/Styles/styles-product'
+import { StackRoutesProps } from '@/routes/StackRoutes'
+import { useRoute } from '@react-navigation/native'
 
-export function Home() {
+export function Product({ navigation, route }: StackRoutesProps<"product">) {
 
   const { products, addProduct, removeProduct, clearProducts, updateStatusProduct } = useProductStore()
   const [status, setStatus] = useState<FilterStatus | null>()
   const [search, setSearch] = useState("")
 
   const existItem = products.some(item => item.description === search)
-
+  const {params} = useRoute()
 
   function handleUpdateStatusProduct(id: string) {
     const statusProduct = products.find(item => item.id === id)
@@ -67,17 +71,24 @@ export function Home() {
 
 
   return (
-    <View style={styles.container}>
-      <Image style={styles.logo}
+    <View style={stylesProduct.container}>
+      <View style={stylesProduct.header}>
+        <ButtonIcon icon='arrow-circle-left' onPress={() => navigation.goBack()} />
+        <Title>
+          Products
+          - {route.params?.id}
+        </Title>
+      </View>
+      <Image style={stylesProduct.logo}
         source={require('@/assets/logo.png')}
         resizeMode="contain"
       />
-      <View style={styles.form}>
+      <View style={stylesProduct.form}>
         <Input value={search} onChangeText={setSearch} placeholder='O que você precisa comprar ?' />
         <Button title='Adicionar' onPress={handleAdd} />
       </View>
-      <View style={styles.content}>
-        <View style={styles.header}>
+      <View style={stylesProduct.content}>
+        <View style={stylesProduct.section}>
 
           <Filterstatus
             status={FilterStatus.DONE}
@@ -91,10 +102,10 @@ export function Home() {
 
           />
           <TouchableOpacity
-            style={styles.clearButton}
+            style={stylesProduct.clearButton}
             onPress={() => handleClearProduct()}
           >
-            <Text style={styles.clearText}>Limpar</Text>
+            <Text style={stylesProduct.clearText}>Limpar</Text>
           </TouchableOpacity>
         </View>
 
@@ -109,9 +120,9 @@ export function Home() {
             />
           )}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          ListEmptyComponent={() => (<Text style={styles.empty}>Nenhum Produto encontrado.</Text>)}
+          contentContainerStyle={stylesProduct.listContent}
+          ItemSeparatorComponent={() => <View style={stylesProduct.separator} />}
+          ListEmptyComponent={() => (<Text style={stylesProduct.empty}>Nenhum Produto encontrado.</Text>)}
         />
       </View>
     </View>
