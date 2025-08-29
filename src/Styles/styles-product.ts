@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native'
 
-export const styles = StyleSheet.create({
+export const stylesProduct = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     backgroundColor: "#d0d2d8",
     // justifyContent: 'center',
-    paddingTop: 62,
+    paddingTop: 50,
   },
   text: {
     fontSize: 20,
@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
     padding: 24,
     marginTop: 24,
   },
-  header: {
+  section: {
     // width: '100%',
     flexDirection: 'row',
     gap: 12,
@@ -63,4 +63,12 @@ export const styles = StyleSheet.create({
     color: '#808080',
     textAlign: 'center',
   },
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 30,
+    // paddingTop: 0,
+  }
 })
